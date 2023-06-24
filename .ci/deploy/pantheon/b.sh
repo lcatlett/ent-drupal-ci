@@ -28,7 +28,7 @@ clen=`expr "${#commands[@]}" - 1` # get length of commands - 1
 
 for i in `seq 0 "$clen"`; do
     (echo "${commands[$i]}" | bash) &   # run the command via bash in subshell
-    echo "$i ith command has been issued as a background job"
+    echo "$INPUT_CMD has been issued as a background job"
 done
 
 wait; # wait for all subshells to finish

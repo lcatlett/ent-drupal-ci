@@ -18,18 +18,43 @@ if [[ "$CI_BRANCH" != "$DEFAULT_BRANCH" ]]
 then
   # Create a new multidev environment (or push to an existing one)
   # Run the following command as input to the b.sh script which runs in the background.
-  ./.ci/deploy/pantheon/b.sh "terminus -n build:env:create $TERMINUS_SITE.dev $TERMINUS_ENV --pr-id=$PR_NUMBER --yes" &
+  ./.ci/deploy/pantheon/b.sh "terminus -n build:env:create $TERMINUS_SITE.dev $TERMINUS_ENV --pr-id=$PR_NUMBER --yes"
   #echo `/bin/sh ./b.sh "terminus -n build:env:create $TERMINUS_SITE.dev $TERMINUS_ENV --pr-id=$PR_NUMBER --yes"
 else
   # Push to the dev environment
-  terminus -n build:env:push "$TERMINUS_SITE.dev" --yes
+    ./.ci/deploy/pantheon/b.sh terminus -n build:env:push "$TERMINUS_SITE.dev" --yes &
 fi
 
+PID=$!
+
+echo "Process $PID ended at time $(date +%T) with exit status $?"
+
 # Wake the environment to make sure the database is reachable.
-terminus -n env:wake "$TERMINUS_SITE.$TERMINUS_ENV"
+wait $PID 
+
+terminus -n env:wake "$TERMINUS_SITE.$TERMINUS_ENV" &
+
+PID=$!
+echo "Process 2 ended at time $(date +%T) with exit status $?"
+
+
+
+wait $PID 
+
+
+
 
 # Update the Drupal database
-terminus -n drush "$TERMINUS_SITE.$TERMINUS_ENV" -- updatedb -y
+terminus -n drush "$TERMINUS_SITE.$TERMINUS_ENV" -- updatedb -y &
+
+PID=$!
+
+echo "Process 3 ended at time $(date +%T) with exit status $?"
+
+
+
+wait $PID 
+
 
 # If exported configuration is available, then import it.
 if [ -f "config/system.site.yml" ] ; then
