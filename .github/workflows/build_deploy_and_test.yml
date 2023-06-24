@@ -41,7 +41,9 @@ jobs:
       - name: Build docker image
         run: |
           mkdir -p /tmp/build-tools-ci && cd /tmp/build-tools-ci
-          docker pull quay.io/pantheon-public/build-tools-ci:8.x-php8.1
+          docker pull quay.io/pantheon-public/build-tools-ci:8.x-php8.1 .
+          ls -ltr
+          pwd
           docker build -f /tmp/build-tools-ci/Dockerfile -t quay.io/pantheon-public/build-tools-ci:8.x-php8.1 /tmp/build-tools-ci
   configure_env_vars:
     container:
