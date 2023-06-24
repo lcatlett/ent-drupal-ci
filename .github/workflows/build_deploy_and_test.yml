@@ -23,6 +23,24 @@ env:
   CI_PULL_REQUEST: ${{ github.event.pull_request._links.html.href }}
 
 jobs:
+  cache:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache Docker image
+        uses: actions/cache@v2
+        with:
+          path: /tmp/build-tools-ci
+          key: build-tools-ci-${{ runner.os }}-${{ hashFiles('**/pantheon.yml') }}
+          restore-keys: |
+            build-tools-ci-${{ runner.os }}-
+
+      - name: Build docker image
+        run: |
+          docker build -t quay.io/pantheon-public/build-tools-ci:8.x-php8.1 .
   configure_env_vars:
     container:
       image: quay.io/pantheon-public/build-tools-ci:8.x-php8.1
