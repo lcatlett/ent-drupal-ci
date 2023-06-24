@@ -3,6 +3,8 @@
 set -m # allow for job control
 EXIT_CODE=0;  # exit code of overall script
 
+# may need to set -o posix if we run into issues with the for loop returning a 127 or bad_trap error
+
 INPUT_CMD=$1
 
 function handleJobs() {

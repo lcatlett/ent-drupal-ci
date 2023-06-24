@@ -9,72 +9,20 @@ set -eo pipefail
 #
 
 # Cut gitignore at the cut mark.
-#terminus build:gitignore:cut
+terminus build:gitignore:cut
 
 # Authenticate with Terminus
-#terminus -n auth:login --machine-token="$TERMINUS_TOKEN"
-
-fakevars() {
-export PATH=$PATH:$HOME/bin
-export PR_NUMBER=1
-export CI_BRANCH=base-package-updates
-export CI_BUILD_NUMBER=5
-export DEFAULT_SITE='ent-drupal-ci'
-export CI_PR_URL=''
-export CI_PROJECT_USERNAME='lcatlett'
-export CI_PROJECT_REPONAME='***'
-export DEFAULT_ENV='pr-1'
-export TERMINUS_HIDE_UPDATE_MESSAGE=1
-export TERMINUS_SITE='ent-drupal-ci'
-export TERMINUS_ENV='pr-1'
-export DEFAULT_BRANCH='master'
-export BEHAT_ADMIN_PASSWORD=$(openssl rand -base64 24)
-export BEHAT_ADMIN_USERNAME=pantheon-ci-testing-$CI_BUILD_NUMBER
-export BEHAT_ADMIN_EMAIL=no-reply+ci-$CI_BUILD_NUMBER@getpantheon.com
-export MULTIDEV_SITE_URL='https://pr-1-***.pantheonsite.io/'
-export DEV_SITE_URL='https://dev-***.pantheonsite.io/'
-export TEST_SITE_URL='https://test-***.pantheonsite.io/'
-export LIVE_SITE_URL='https://live-***.pantheonsite.io/'
-export ARTIFACTS_DIR='artifacts'
-export ARTIFACTS_FULL_DIR='/tmp/artifacts'
-export CI_BUILD_URL='https://github.com/lcatlett/***/actions/runs/5362799050'
-export CI_NODE_INDEX=0
-export CI_REPOSITORY_URL='https://github.com/lcatlett/***'
-export ARTIFACTS_DIR_URL='https://github.com/lcatlett/***/actions/runs/5362799050/#artifacts'
-export PATH=$PATH:$HOME/bin
-export PR_NUMBER=1
-export CI_BRANCH=base-package-updates
-export CI_BUILD_NUMBER=5
-export DEFAULT_SITE='ent-drupal-ci'
-export CI_PR_URL=''
-export CI_PROJECT_USERNAME='lcatlett'
-export CI_PROJECT_REPONAME='***'
-export DEFAULT_ENV='pr-1'
-export TERMINUS_HIDE_UPDATE_MESSAGE=1
-export TERMINUS_SITE='ent-drupal-ci'
-export TERMINUS_ENV='pr-1'
-export DEFAULT_BRANCH='master'
-export BEHAT_ADMIN_PASSWORD=$(openssl rand -base64 24)
-export BEHAT_ADMIN_USERNAME=pantheon-ci-testing-$CI_BUILD_NUMBER
-export BEHAT_ADMIN_EMAIL=no-reply+ci-$CI_BUILD_NUMBER@getpantheon.com
-export MULTIDEV_SITE_URL='https://pr-1-***.pantheonsite.io/'
-export DEV_SITE_URL='https://dev-***.pantheonsite.io/'
-export TEST_SITE_URL='https://test-***.pantheonsite.io/'
-export LIVE_SITE_URL='https://live-***.pantheonsite.io/'
-export ARTIFACTS_DIR='artifacts'
-export ARTIFACTS_FULL_DIR='/tmp/artifacts'
-}
-
-fakevars
+terminus -n auth:login --machine-token="$TERMINUS_TOKEN"
 
 if [[ "$CI_BRANCH" != "$DEFAULT_BRANCH" ]]
 then
   # Create a new multidev environment (or push to an existing one)
-  # Run the following command as input to the b.sh script which runs in the background.
-  ./.ci/deploy/pantheon/b.sh "terminus -n build:env:create $TERMINUS_SITE.dev $TERMINUS_ENV --pr-id=$PR_NUMBER --yes" &
+  # Run the following command as input to the b.sh script which provides background job control.
+  ./.ci/deploy/pantheon/b.sh "terminus -n build:env:create $TERMINUS_SITE.dev $TERMINUS_ENV --pr-id=$PR_NUMBER --yes"
   #echo `/bin/sh ./b.sh "terminus -n build:env:create $TERMINUS_SITE.dev $TERMINUS_ENV --pr-id=$PR_NUMBER --yes"
 else
   # Push to the dev environment
+    # Run the following command as input to the b.sh script which provides background job control.
     ./.ci/deploy/pantheon/b.sh terminus -n build:env:push "$TERMINUS_SITE.dev" --yes &
 fi
 
@@ -88,25 +36,21 @@ wait $PID
 terminus -n env:wake "$TERMINUS_SITE.$TERMINUS_ENV" &
 
 PID=$!
-echo "Process 2 ended at time $(date +%T) with exit status $?"
-
-
+echo "Process $PID ended at time $(date +%T) with exit status $?"
 
 wait $PID 
-
-
-
 
 # Update the Drupal database
 terminus -n drush "$TERMINUS_SITE.$TERMINUS_ENV" -- updatedb -y &
 
 PID=$!
 
-echo "Process 3 ended at time $(date +%T) with exit status $?"
-
-
+echo "Process $PID ended at time $(date +%T) with exit status $?"
 
 wait $PID 
+
+echo "Process $PID ended at time $(date +%T) with exit status $?"
+
 
 
 # If exported configuration is available, then import it.
