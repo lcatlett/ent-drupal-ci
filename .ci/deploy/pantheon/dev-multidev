@@ -18,7 +18,7 @@ if [[ "$CI_BRANCH" != "$DEFAULT_BRANCH" ]]
 then
   # Create a new multidev environment (or push to an existing one)
   # Run the following command as input to the b.sh script which runs in the background.
-  source ./b.sh "terminus -n build:env:create $TERMINUS_SITE.dev $TERMINUS_ENV --pr-id=$PR_NUMBER --yes" &
+  ./.ci/deploy/pantheon/b.sh "terminus -n build:env:create $TERMINUS_SITE.dev $TERMINUS_ENV --pr-id=$PR_NUMBER --yes" &
   #echo `/bin/sh ./b.sh "terminus -n build:env:create $TERMINUS_SITE.dev $TERMINUS_ENV --pr-id=$PR_NUMBER --yes"
 else
   # Push to the dev environment
