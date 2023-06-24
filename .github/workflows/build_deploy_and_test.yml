@@ -24,8 +24,10 @@ env:
 
 jobs:
   cache:
+    container:
+      image: quay.io/pantheon-public/build-tools-ci:8.x-php8.1
+      options: --user root
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
