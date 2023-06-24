@@ -31,20 +31,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Cache Docker image
-        uses: actions/cache@v2
+        uses: ScribeMD/docker-cache@0.3.3
         with:
-          path: /tmp/build-tools-ci
           key: build-tools-ci-${{ runner.os }}-${{ hashFiles('**/pantheon.yml') }}
           restore-keys: |
             build-tools-ci-${{ runner.os }}-
-
-      - name: Build docker image
-        run: |
-          mkdir -p /tmp/build-tools-ci && cd /tmp/build-tools-ci
-          docker pull quay.io/pantheon-public/build-tools-ci:8.x-php8.1
-          ls -ltr
-          pwd
-          docker build -f /tmp/build-tools-ci/Dockerfile -t quay.io/pantheon-public/build-tools-ci:8.x-php8.1 /tmp/build-tools-ci
   configure_env_vars:
     container:
       image: quay.io/pantheon-public/build-tools-ci:8.x-php8.1
