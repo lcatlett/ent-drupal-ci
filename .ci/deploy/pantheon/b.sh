@@ -3,6 +3,8 @@
 set -m # allow for job control
 EXIT_CODE=0;  # exit code of overall script
 
+INPUT_CMD=$1
+
 function handleJobs() {
      for job in `jobs -p`; do
          echo "PID => ${job}"
@@ -19,9 +21,7 @@ trap 'handleJobs' CHLD  # trap command is the key part
 DIRN=$(dirname "$0");
 
 commands=(
-    "{ terminus whoami; }"
-    "{ terminus multidev:list ent-drupal-ci; }"
-    "{ terminus -n build:env:create "ent-drupal-ci.dev" "pr-1" --pr-id=1 --yes -vvv; }"
+    "{ $INPUT_CMD; }"
 )
 
 clen=`expr "${#commands[@]}" - 1` # get length of commands - 1
