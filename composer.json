@@ -14,13 +14,14 @@
         }
     ],
     "require": {
-        "pantheon-upstreams/upstream-configuration": "*",
         "composer/installers": "^1.9",
-        "drupal/core-composer-scaffold": "^9.2",
-        "drupal/core-recommended": "^9.2",
-        "pantheon-systems/drupal-integrations": "^9",
         "cweagans/composer-patches": "^1.7",
-        "drush/drush": "^11 || ^12"
+        "drupal/core-composer-scaffold": "^9.2",
+        "drupal/core-recommended": "^9.4.8",
+        "drush/drush": "^11 || ^12",
+        "pantheon-systems/drupal-integrations": "^9",
+        "pantheon-upstreams/upstream-configuration": "*",
+        "topfloor/composer-cleanup-vcs-dirs": "^1.1"
     },
     "require-dev": {
         "drupal/core-dev": "^9.2",
@@ -44,6 +45,11 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "extra": {
+        "installer-types": [
+            "bower-asset",
+            "npm-asset",
+            "drupal-library"
+        ],
         "drupal-scaffold": {
             "locations": {
                 "web-root": "./web"
@@ -84,9 +90,6 @@
             ],
             "web/themes/custom/{$name}": [
                 "type:drupal-custom-theme"
-            ],
-            "web/private/scripts/quicksilver/{$name}/": [
-                "type:quicksilver-script"
             ]
         },
         "composer-exit-on-patch-failure": true,
@@ -118,11 +121,16 @@
             "./vendor/bin/phpcs --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,css,info,txt,md --ignore=node_modules,bower_components,vendor ./web/themes/custom",
             "./vendor/bin/phpcs --standard=DrupalPractice --extensions=php,module,inc,install,test,profile,theme,css,info,txt,md --ignore=node_modules,bower_components,vendor ./web/modules/custom",
             "./vendor/bin/phpcs --standard=DrupalPractice --extensions=php,module,inc,install,test,profile,theme,css,info,txt,md --ignore=node_modules,bower_components,vendor ./web/themes/custom"
-        ]
+        ],
+        "nuke": [
+            "rm -rf vendor web/core web/modules/contrib web/profiles/contrib web/themes/contrib",
+            "@composer clearcache --ansi",
+            "@composer install --ansi --no-interaction --optimize-autoloader"
+          ]
     },
     "config": {
         "preferred-install": "dist",
-        "sort-packages": false,
+        "sort-packages": true,
         "platform": {
             "php": "8.1.13"
         },
@@ -131,7 +139,8 @@
             "cweagans/composer-patches": true,
             "drupal/core-composer-scaffold": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "topfloor/composer-cleanup-vcs-dirs": true
         }
     }
 }

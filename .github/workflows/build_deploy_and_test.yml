@@ -23,9 +23,22 @@ env:
   CI_PULL_REQUEST: ${{ github.event.pull_request._links.html.href }}
 
 jobs:
+  cache:
+    container:
+      image: ghcr.io/lcatlett/dbt-ci:8.x-php8.1
+      options: --user root
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache Docker images.
+        uses: ScribeMD/docker-cache@0.3.3
+        with:
+          key: build-tools-ci-${{ runner.os }}-${{ hashFiles('**/build_deploy_and_test.yml') }}
   configure_env_vars:
     container:
-      image: quay.io/pantheon-public/build-tools-ci:8.x-php8.1
+      image: ghcr.io/lcatlett/dbt-ci:8.x-php8.1
       options: --user root
     runs-on: ubuntu-latest
     steps:
@@ -78,7 +91,7 @@ jobs:
 
   static_tests:
     container:
-      image: quay.io/pantheon-public/build-tools-ci:8.x-php8.1
+      image: ghcr.io/lcatlett/dbt-ci:8.x-php8.1
       options: --user root
     runs-on: ubuntu-latest
     steps:
@@ -113,7 +126,7 @@ jobs:
 
   deploy_to_pantheon:
     container:
-      image: quay.io/pantheon-public/build-tools-ci:8.x-php8.1
+      image: ghcr.io/lcatlett/dbt-ci:8.x-php8.1
       options: --user root
     runs-on: ubuntu-latest
     needs: [configure_env_vars, static_tests]
@@ -196,7 +209,7 @@ jobs:
 
   behat_test:
     container:
-      image: quay.io/pantheon-public/build-tools-ci:8.x-php8.1
+      image: ghcr.io/lcatlett/dbt-ci:8.x-php8.1
       options: --user root
     runs-on: ubuntu-latest
     continue-on-error: true
